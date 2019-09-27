@@ -51,6 +51,17 @@ class TeamsController < ApplicationController
     @team = current_user.keep_team_id ? Team.find(current_user.keep_team_id) : current_user.teams.first
   end
 
+  def chenge_owner
+    @team = Team.find(params[:id])
+    if @team.update(owner_id: params[:owner_id])
+      NoticeMailer.sendmail_owner(@team).deliver
+      redirect_to @team, notice: 'オーナー権限の移譲に成功しました！'
+    else
+      flash.now[:error] = 'オーナー権限の移譲に失敗しました、、'
+      render :show
+    end
+  end
+
   private
 
   def set_team
